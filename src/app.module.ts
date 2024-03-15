@@ -6,16 +6,18 @@ import { FilesModule } from './files/files.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserEntity } from './users/entities/user.entity';
 import { FileEntity } from './files/entities/file.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'bubble.db.elephantsql.com',
-      port: 5432,
-      username: 'crpyxuct',
-      password: 'OhRwTueBEpbtZ_KNBN5Pz5Lhu74G-Yx7',
-      database: 'crpyxuct',
+      host: process.env.DB_HOST,
+      port: parseInt(process.env.DB_PORT, 10) || 5432,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
       entities: [UserEntity, FileEntity],
       synchronize: true,
     }),
