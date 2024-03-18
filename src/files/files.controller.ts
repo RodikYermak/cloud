@@ -6,6 +6,8 @@ import {
   Post,
   UploadedFile,
   UseGuards,
+  Query,
+  Delete,
 } from '@nestjs/common';
 import { FilesService } from './files.service';
 
@@ -16,6 +18,9 @@ import { ApiConsumes, ApiTags, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 
 import { fileStorage } from './storage';
 import { JwtAuthGuard } from 'src/auth/guard/jwt.guard';
+import { UserId } from 'src/decorators/user-id.decorator';
+
+import { FileType } from './entities/file.entity';
 
 @Controller('files')
 @ApiTags('files')
@@ -25,8 +30,8 @@ export class FilesController {
   constructor(private readonly filesService: FilesService) {}
 
   @Get()
-  findAll() {
-    return this.filesService.findAll();
+  findAll(@UserId() userId: number, @Query('type') fileType: FileType) {
+    return this.filesService.findAll(userId, fileType);
   }
 
   @Post()
@@ -54,7 +59,15 @@ export class FilesController {
       }),
     )
     file: Express.Multer.File,
+    @UserId() userId: number,
   ) {
-    return file;
+    return this.filesService.create(file, userId);
+  }
+
+  @Delete()
+  remove(@UserId() userId: number, @Query('ids') ids: string) {
+    return this.filesService.remove(userId, ids);
   }
 }
+
+// 28:30
